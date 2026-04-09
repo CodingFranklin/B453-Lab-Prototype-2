@@ -47,9 +47,11 @@ public class Generator : MonoBehaviour
         }
         
         Transform finalExit = exits[Random.Range(0, exits.Count)];
-        yield return StartCoroutine(TrySpawnNextRoom(finalExit, endRoom));
+        yield return StartCoroutine(TrySpawnEndRoom(finalExit));
         
         FillHoles();
+
+        Debug.Log("Generation Complete!");
     }
 
     // private void SpawnNextRoom()
@@ -115,6 +117,31 @@ public class Generator : MonoBehaviour
             AddAllExits(newRoom);
             exits.Remove(exit);
             roomNumber--;
+        }
+    }
+    
+    private IEnumerator TrySpawnEndRoom(Transform exit)
+    {
+        GameObject end = Instantiate(endRoom, exit.position, exit.rotation);
+
+        // wait for physics to update
+        yield return new WaitForFixedUpdate();
+
+        RoomData data = end.GetComponent<RoomData>();
+
+        while (true)
+        {
+            if (data.isOverlapping)
+            {
+                Destroy(end);
+            }
+            else
+            {
+                AddAllExits(end);
+                exits.Remove(exit);
+                roomNumber--;
+                break;
+            }
         }
     }
 

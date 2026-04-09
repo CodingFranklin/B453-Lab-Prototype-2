@@ -1,16 +1,45 @@
+using System;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class RoomData : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public bool isOverlapping = false;
+    public bool hasVisited = false;
+
+    private void OnTriggerEnter2D(Collider2D other)
     {
+        if (other.CompareTag("Room"))
+        {
+            isOverlapping = true;
+        }
         
+        if (other.CompareTag("Player") && !hasVisited)
+        {
+            hasVisited = true;
+            SetWallsColor(Color.chartreuse);
+        }
     }
 
-    // Update is called once per frame
-    void Update()
+    private void OnTriggerStay2D(Collider2D other)
     {
-        
+        if (other.CompareTag("Room"))
+        {
+            isOverlapping = true;
+        }
+    }
+    
+    private void SetWallsColor(Color color)
+    {
+        Transform wallsParent = transform.GetChild(1);
+
+        foreach (Transform wall in wallsParent)
+        {
+            SpriteRenderer sr = wall.GetComponent<SpriteRenderer>();
+            if (sr != null)
+            {
+                sr.color = color;
+            }
+        }
     }
 }
